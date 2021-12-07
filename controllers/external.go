@@ -1,59 +1,54 @@
 package controllers
 
 import (
-	"challenge/api/errorsHandlers"
-	"challenge/api/files"
 	"fmt"
+	"net/http"
 	"strings"
 
-	structures "challenge/api/structs"
-
-	"github.com/mtslzr/pokeapi-go"
-	"github.com/mtslzr/pokeapi-go/structs"
+	"challenge/api/errorsHandlers"
+	"challenge/api/files"
+	"challenge/api/structs"
 )
 
-var next structures.Next
-var previous structures.Next
+var next structs.Next
+var previous structs.Next
+var externalPokemons structs.ExternalPokemon
+
+var pokeApiUrl string = "https://pokeapi.co/api/v2/pokemon"
 
 func InitNext() {
-	next = structures.Next{Offset: 0, Limit: 30}
-	previous = structures.Next{Offset: 0, Limit: 30}
+	next = structs.Next{Offset: 0, Limit: 30}
+	previous = structs.Next{Offset: 0, Limit: 30}
 }
 
 func getPokemonsExternal() {
-
-	pokemonsResponse, err := pokeapi.Resource("pokemon", 0, next.Limit)
+	url := next.GetNextUrl(pokeApiUrl)
+	response, err := http.Get(url)
 	errorsHandlers.CheckNilErr(err)
 
-	next.SetNext(pokemonsResponse.Next)
-
-	files.SavePokemonsInCSV(pokemonsResponse)
-}
-
-func findPokemonByName(name string) (structs.Pokemon, error) {
-	pokemonsResponse, err := pokeapi.Pokemon(name)
-
-	return pokemonsResponse, err
+	externalPokemons.SetPokemons(*response)
+	next.SetNext(externalPokemons.Next)
+	files.SavePokemonsInCSV(externalPokemons)
 }
 
 func getNextPokemonsExternal() {
-	pokemonsResponse, err := pokeapi.Resource("pokemon", next.Offset, next.Limit)
-	errorsHandlers.CheckNilErr(err)
-	next.SetNext(pokemonsResponse.Next)
-	resPrevious := fmt.Sprintf("%v", pokemonsResponse.Previous)
-	if !strings.Contains(resPrevious, "nil") {
-		previous.SetNext(resPrevious)
-	}
-	files.SavePokemonsInCSV(pokemonsResponse)
+	url := next.GetNextUrl(pokeApiUrl)
+	updatePokemonsExternal(url)
 }
 
 func getPreviousPokemonsExternal() {
-	pokemonsResponse, err := pokeapi.Resource("pokemon", previous.Offset, previous.Limit)
+	url := previous.GetNextUrl(pokeApiUrl)
+	updatePokemonsExternal(url)
+}
+
+func updatePokemonsExternal(url string) {
+	response, err := http.Get(url)
 	errorsHandlers.CheckNilErr(err)
-	next.SetNext(pokemonsResponse.Next)
-	resPrevious := fmt.Sprintf("%v", pokemonsResponse.Previous)
+	externalPokemons.SetPokemons(*response)
+	next.SetNext(externalPokemons.Next)
+	resPrevious := fmt.Sprintf("%v", externalPokemons.Previous)
 	if !strings.Contains(resPrevious, "nil") {
 		previous.SetNext(resPrevious)
 	}
-	files.SavePokemonsInCSV(pokemonsResponse)
+	files.SavePokemonsInCSV(externalPokemons)
 }

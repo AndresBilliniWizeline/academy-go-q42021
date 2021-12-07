@@ -38,12 +38,24 @@ func GetPokemons(w http.ResponseWriter, r *http.Request) {
 func GetPokemon(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Get pokemon")
 	w.Header().Set("Content-Type", "application/json")
-	// grab id from request
+	// grab name from request
 	params := mux.Vars(r)
 	name := params["name"]
-	pokemon, err := findPokemonByName(name)
 
-	if err != nil {
+	if len(pokemons) == 0 {
+		initPokemons()
+	}
+	pokemon := &structs.Pokemon{}
+	for _, p := range pokemons {
+		if p.Name == name {
+			pokemon.Id = p.Id
+			pokemon.Name = p.Name
+			pokemon.Url = p.Url
+			break
+		}
+	}
+
+	if pokemon == nil {
 		http.Error(w, "Pokemon not found", http.StatusNotFound)
 		return
 	}
@@ -75,9 +87,12 @@ func ConcurrencyGetPokemons(w http.ResponseWriter, r *http.Request) {
 	var query structs.Query
 	rawQuery := r.URL.Query()
 	query.SetValues(rawQuery)
+	fmt.Println(query)
 
-	if !query.ValidateType() {
-		http.Error(w, "The type param is not valid", http.StatusNotFound)
+	queryError, multiple := query.HandleError()
+
+	if multiple > 0 {
+		query.SendErrorMessage(w, queryError, multiple)
 		return
 	}
 

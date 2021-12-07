@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
-
 	"challenge/api/routers"
+
+	"github.com/gorilla/mux"
 )
 
 func initServer() {

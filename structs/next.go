@@ -20,3 +20,10 @@ func (n *Next) SetNext(response string) {
 	n.Offset = offset
 	n.Limit = limit
 }
+
+func (n *Next) GetNextUrl(url string) string {
+	offset := strconv.Itoa(n.Offset)
+	limit := strconv.Itoa(n.Limit)
+	newUrl := url + "?offset=" + offset + "&limit=" + limit
+	return newUrl
+}
