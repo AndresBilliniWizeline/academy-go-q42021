@@ -10,7 +10,7 @@ type Next struct {
 	Limit  int
 }
 
-func (n *Next) SetNext(response string) {
+func (n *Next) SetInfo(response string) {
 	split := strings.Split(response, "?")
 	params := strings.Split(split[1], "&")
 	offsetString := strings.Split(params[0], "offset=")[1]
@@ -21,7 +21,7 @@ func (n *Next) SetNext(response string) {
 	n.Limit = limit
 }
 
-func (n *Next) GetNextUrl(url string) string {
+func (n *Next) GetUrl(url string) string {
 	offset := strconv.Itoa(n.Offset)
 	limit := strconv.Itoa(n.Limit)
 	newUrl := url + "?offset=" + offset + "&limit=" + limit

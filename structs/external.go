@@ -2,7 +2,6 @@ package structs
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -24,9 +23,7 @@ type Previous struct {
 func (p *ExternalPokemon) SetPokemons(response http.Response) {
 	readBody, bodyErr := ioutil.ReadAll(response.Body)
 	errorsHandlers.CheckNilErr(bodyErr)
-	body := string(readBody)
 
-	fmt.Println("response", body)
 	var responseString strings.Builder
 	responseString.Write(readBody)
 	content := responseString.String()

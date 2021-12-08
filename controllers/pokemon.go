@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 
 	"challenge/api/files"
@@ -40,22 +41,12 @@ func GetPokemon(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// grab name from request
 	params := mux.Vars(r)
-	name := params["name"]
+	name := strings.ToLower(params["name"])
 
-	if len(pokemons) == 0 {
-		initPokemons()
-	}
 	pokemon := &structs.Pokemon{}
-	for _, p := range pokemons {
-		if p.Name == name {
-			pokemon.Id = p.Id
-			pokemon.Name = p.Name
-			pokemon.Url = p.Url
-			break
-		}
-	}
+	getPokemonExternal(name, pokemon)
 
-	if pokemon == nil {
+	if pokemon == nil || pokemon.Id == 0 {
 		http.Error(w, "Pokemon not found", http.StatusNotFound)
 		return
 	}

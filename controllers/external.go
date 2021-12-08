@@ -22,22 +22,30 @@ func InitNext() {
 }
 
 func getPokemonsExternal() {
-	url := next.GetNextUrl(pokeApiUrl)
+	url := next.GetUrl(pokeApiUrl)
 	response, err := http.Get(url)
 	errorsHandlers.CheckNilErr(err)
 
 	externalPokemons.SetPokemons(*response)
-	next.SetNext(externalPokemons.Next)
+	next.SetInfo(externalPokemons.Next)
 	files.SavePokemonsInCSV(externalPokemons)
 }
 
+func getPokemonExternal(name string, pokemon *structs.Pokemon) {
+	url := pokeApiUrl + "/" + name
+	response, err := http.Get(url)
+	errorsHandlers.CheckNilErr(err)
+
+	pokemon.SetPokemon(*response)
+}
+
 func getNextPokemonsExternal() {
-	url := next.GetNextUrl(pokeApiUrl)
+	url := next.GetUrl(pokeApiUrl)
 	updatePokemonsExternal(url)
 }
 
 func getPreviousPokemonsExternal() {
-	url := previous.GetNextUrl(pokeApiUrl)
+	url := previous.GetUrl(pokeApiUrl)
 	updatePokemonsExternal(url)
 }
 
@@ -45,10 +53,10 @@ func updatePokemonsExternal(url string) {
 	response, err := http.Get(url)
 	errorsHandlers.CheckNilErr(err)
 	externalPokemons.SetPokemons(*response)
-	next.SetNext(externalPokemons.Next)
+	next.SetInfo(externalPokemons.Next)
 	resPrevious := fmt.Sprintf("%v", externalPokemons.Previous)
 	if !strings.Contains(resPrevious, "nil") {
-		previous.SetNext(resPrevious)
+		previous.SetInfo(resPrevious)
 	}
 	files.SavePokemonsInCSV(externalPokemons)
 }
