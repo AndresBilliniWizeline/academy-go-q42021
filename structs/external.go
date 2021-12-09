@@ -9,6 +9,7 @@ import (
 	"challenge/api/errorsHandlers"
 )
 
+// Structure for external API calls
 type ExternalPokemon struct {
 	Count    int         `json:"count"`
 	Next     string      `json:"next"`
@@ -16,10 +17,7 @@ type ExternalPokemon struct {
 	Results  []Pokemon   `json:"results"`
 }
 
-type Previous struct {
-	Previous string `json:"previous"`
-}
-
+// Set the external response of pokemons in a json format
 func (p *ExternalPokemon) SetPokemons(response http.Response) {
 	readBody, bodyErr := ioutil.ReadAll(response.Body)
 	errorsHandlers.CheckNilErr(bodyErr)

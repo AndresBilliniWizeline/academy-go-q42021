@@ -18,16 +18,19 @@ var concurrencyPokemons []structs.Pokemon
 var wg sync.WaitGroup
 var mut sync.Mutex
 
+// set all pokemons coming from the csv file to the pokemons var
 func initPokemons() {
 	fmt.Println("Set all pokemons")
 	pokemons = nil
 	pokemons = append(pokemons, files.GetPokemonInfoCSV()...)
 }
 
+// Home Page, sends a Hello message
 func HomePage(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("<h1>Welcome to my Pokemon API with golang</h1>"))
 }
 
+// Response an array of Pokemons
 func GetPokemons(w http.ResponseWriter, r *http.Request) {
 	getPokemonsExternal()
 	initPokemons()
@@ -36,6 +39,7 @@ func GetPokemons(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pokemons)
 }
 
+// Response the pokemon that you are looking for
 func GetPokemon(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Get pokemon")
 	w.Header().Set("Content-Type", "application/json")
@@ -55,6 +59,7 @@ func GetPokemon(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pokemon)
 }
 
+// Response the next set of pokemons
 func GetNextPokemons(w http.ResponseWriter, r *http.Request) {
 	getNextPokemonsExternal()
 	initPokemons()
@@ -63,6 +68,7 @@ func GetNextPokemons(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pokemons)
 }
 
+// Response the previous set of pokemons
 func GetPreviousPokemons(w http.ResponseWriter, r *http.Request) {
 	getPreviousPokemonsExternal()
 	initPokemons()
@@ -71,6 +77,7 @@ func GetPreviousPokemons(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pokemons)
 }
 
+// Response an array of pokemons
 func ConcurrencyGetPokemons(w http.ResponseWriter, r *http.Request) {
 	initPokemons()
 	fmt.Println("Get Concurrency pokemons")
@@ -101,6 +108,7 @@ func ConcurrencyGetPokemons(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(concurrencyPokemons)
 }
 
+// Search for the pokemons with the query params
 func getEvenOrOdd(
 	query structs.Query,
 	pokemon structs.Pokemon,

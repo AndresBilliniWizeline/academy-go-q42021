@@ -10,6 +10,7 @@ import (
 
 const get = http.MethodGet
 
+// All the routes that the API has
 func Routes(router *mux.Router) {
 	controllers.InitNext()
 	router.HandleFunc("/", controllers.HomePage).Methods(get)

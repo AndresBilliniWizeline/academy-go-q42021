@@ -10,8 +10,10 @@ import (
 	"challenge/api/structs"
 )
 
+// const to the csv file
 const pokedex = "./db/api.csv"
 
+// Reads the csv file information and returns an array of pokemons
 func GetPokemonInfoCSV() []structs.Pokemon {
 	csvFile, err := os.Open(pokedex)
 	errorsHandlers.CheckFileErr(err)
@@ -31,6 +33,7 @@ func GetPokemonInfoCSV() []structs.Pokemon {
 	return pokemons
 }
 
+// Save all new information to the CSV file
 func SavePokemonsInCSV(pokemons structs.ExternalPokemon) {
 	csvFile, err := os.Create(pokedex)
 	errorsHandlers.CheckFileErr(err)

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"challenge/api/errorsHandlers"
 )
@@ -14,18 +15,23 @@ type Query struct {
 	ItemsPerWorker int    `json:"items_per_worker"`
 }
 
+// Validates that the query param type is odd or even
 func (q *Query) ValidateType() bool {
-	return q.Type == "odd" || q.Type == "even"
+	qType := strings.ToLower(q.Type)
+	return qType == "odd" || qType == "even"
 }
 
+// Validates that the query param Items is a natural number
 func (q *Query) ValidateItems() bool {
-	return q.Items != 0
+	return q.Items > 0
 }
 
+// Validates that the query param Items Per Worker is a natural number
 func (q *Query) ValidateItemsPerWorker() bool {
-	return q.ItemsPerWorker != 0
+	return q.ItemsPerWorker > 0
 }
 
+// Transforms the query values to the Query structure
 func (q *Query) SetValues(rawQuery url.Values) {
 	q.Type = rawQuery.Get("type")
 	Items, itemsErr := strconv.Atoi(rawQuery.Get("items"))
@@ -36,6 +42,7 @@ func (q *Query) SetValues(rawQuery url.Values) {
 	q.ItemsPerWorker = ItemsPerWorker
 }
 
+// Sends an error message if at least one of the query params is missing
 func (q *Query) SendErrorMessage(w http.ResponseWriter, element string, multiple int) {
 	var message string
 	if multiple > 1 {
@@ -46,6 +53,7 @@ func (q *Query) SendErrorMessage(w http.ResponseWriter, element string, multiple
 	http.Error(w, message, http.StatusBadRequest)
 }
 
+// Handles the error message and how many query params are missing
 func (q *Query) HandleError() (string, int) {
 	var queryError string
 	var typeError string
