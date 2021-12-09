@@ -10,7 +10,7 @@ import (
 	"challenge/api/structs"
 )
 
-const pokedex = "./files/api.csv"
+const pokedex = "./db/api.csv"
 
 func GetPokemonInfoCSV() []structs.Pokemon {
 	csvFile, err := os.Open(pokedex)

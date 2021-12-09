@@ -40,6 +40,7 @@ func GetPokemon(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Get pokemon")
 	w.Header().Set("Content-Type", "application/json")
 	// grab name from request
+
 	params := mux.Vars(r)
 	name := strings.ToLower(params["name"])
 
@@ -78,7 +79,6 @@ func ConcurrencyGetPokemons(w http.ResponseWriter, r *http.Request) {
 	var query structs.Query
 	rawQuery := r.URL.Query()
 	query.SetValues(rawQuery)
-	fmt.Println(query)
 
 	queryError, multiple := query.HandleError()
 
@@ -93,6 +93,11 @@ func ConcurrencyGetPokemons(w http.ResponseWriter, r *http.Request) {
 		wg.Add(1)
 	}
 	wg.Wait()
+	if query.Items > query.ItemsPerWorker {
+		concurrencyPokemons = concurrencyPokemons[0:query.ItemsPerWorker]
+	} else {
+		concurrencyPokemons = concurrencyPokemons[0:query.Items]
+	}
 	json.NewEncoder(w).Encode(concurrencyPokemons)
 }
 
@@ -102,7 +107,7 @@ func getEvenOrOdd(
 ) {
 	defer wg.Done()
 	if len(concurrencyPokemons) < query.Items {
-		switch query.Type {
+		switch strings.ToLower(query.Type) {
 		case "odd":
 			if pokemon.Odd() && len(concurrencyPokemons) < query.ItemsPerWorker {
 				mut.Lock()

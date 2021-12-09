@@ -9,12 +9,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func initServer() {
+func initServer() *mux.Router {
 	router := mux.NewRouter()
 	routers.Routes(router)
-	log.Fatal(http.ListenAndServe(":4000", router))
+	return router
 }
 
 func main() {
-	initServer()
+	router := initServer()
+	log.Fatal(http.ListenAndServe(":4000", router))
 }

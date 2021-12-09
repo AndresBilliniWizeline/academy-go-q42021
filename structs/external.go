@@ -10,10 +10,10 @@ import (
 )
 
 type ExternalPokemon struct {
-	Count    int       `json:"count"`
-	Next     string    `json:"next"`
-	Previous *Previous `json:"previous"`
-	Results  []Pokemon `json:"results"`
+	Count    int         `json:"count"`
+	Next     string      `json:"next"`
+	Previous interface{} `json:"previous"`
+	Results  []Pokemon   `json:"results"`
 }
 
 type Previous struct {
@@ -23,6 +23,7 @@ type Previous struct {
 func (p *ExternalPokemon) SetPokemons(response http.Response) {
 	readBody, bodyErr := ioutil.ReadAll(response.Body)
 	errorsHandlers.CheckNilErr(bodyErr)
+	defer response.Body.Close()
 
 	var responseString strings.Builder
 	responseString.Write(readBody)
